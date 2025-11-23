@@ -1,3 +1,11 @@
+// User & App Settings
+export interface UserSettings {
+  topic: string;
+  level: 'Undergraduate' | 'Postgraduate' | 'PhD/Expert';
+  language: 'Indonesian' | 'English';
+  apiKey?: string;
+}
+
 export interface Material {
   id: string;
   title: string;
@@ -13,7 +21,7 @@ export interface Material {
 export interface Section {
   id: string;
   title: string;
-  contentHtml: string; // Sanitized HTML
+  contentHtml: string;
   pageReference?: number;
   durationMinutes: number;
   exercises?: Exercise[];
@@ -34,8 +42,37 @@ export interface VideoSuggestion {
   timestampStart: number;
 }
 
-export interface IngestResponse {
-  success: boolean;
-  message: string;
-  data?: Material;
+// Course Generator Types
+export interface ModuleOutline {
+  index: number;
+  title: string;
+  description: string;
+  status: 'pending' | 'generating' | 'completed' | 'error';
+  content?: string;
+}
+
+export interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+  explanation: string;
+}
+
+export interface YouTubeSummary {
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  summary: {
+    intro: string;
+    concepts: string;
+    examples: string;
+  };
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  timestamp: Date;
 }

@@ -2,17 +2,21 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Upload, LayoutDashboard, ShieldAlert, Menu, X, Settings } from 'lucide-react';
+import { BookOpen, Upload, LayoutDashboard, Menu, X, Youtube, GraduationCap } from 'lucide-react';
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
+  // Hide sidebar on onboarding page
+  if (pathname === '/onboarding') return null;
+
   const navItems = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Materi Belajar', href: '/materials', icon: BookOpen },
+    { name: 'AI Course Gen', href: '/learn', icon: GraduationCap },
+    { name: 'Asisten Video', href: '/video-assist', icon: Youtube },
     { name: 'Upload PDF', href: '/upload', icon: Upload },
-    { name: 'Quality Review', href: '/review', icon: ShieldAlert },
+    { name: 'Library', href: '/materials', icon: BookOpen },
   ];
 
   return (
@@ -61,10 +65,9 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-800">
-          <button className="flex items-center px-4 py-3 w-full text-muted hover:text-light transition-colors">
-            <Settings size={20} className="mr-3" />
-            <span>Settings</span>
-          </button>
+          <div className="flex items-center px-4 py-3 w-full text-muted text-xs">
+            <span>© 2025 OT-LEARN Pro</span>
+          </div>
         </div>
       </aside>
 

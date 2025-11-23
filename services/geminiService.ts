@@ -1,6 +1,5 @@
-
-import { GoogleGenAI, Type, Schema, Chat } from "@google/genai";
-import { ModuleOutline, QuizQuestion, UserSettings, YouTubeSummary } from "../types";
+import { GoogleGenAI, Schema, Type } from "@google/genai";
+import { ModuleOutline, QuizQuestion, UserSettings, YouTubeSummary } from "../lib/types";
 
 // Helper to get client with dynamic key
 const getClient = (apiKey?: string) => {
@@ -213,7 +212,7 @@ export const summarizeVideoTopic = async (query: string, apiKey: string): Promis
 /**
  * Chat with Mentor
  */
-export const createMentorChat = (settings: UserSettings): Chat => {
+export const createMentorChat = (settings: UserSettings) => {
   const ai = getClient(settings.apiKey);
   return ai.chats.create({
     model: MODEL_FLASH,

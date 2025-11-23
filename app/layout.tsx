@@ -1,8 +1,9 @@
 import './globals.css';
 import Sidebar from '@/components/Sidebar';
-import { Inter } from 'next/font/google';
+import { Inter, Merriweather } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const merriweather = Merriweather({ weight: ['300', '400', '700'], subsets: ['latin'], variable: '--font-serif' });
 
 export const metadata = {
   title: 'OT-LEARN | Expert Platform',
@@ -16,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-main text-light`}>
+      <body className={`${inter.variable} ${merriweather.variable} font-sans bg-main text-light`}>
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <main className="flex-1 w-full lg:ml-64 overflow-hidden relative">
