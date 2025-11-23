@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserSettings, YouTubeSummary } from '../lib/types';
 import { summarizeVideoTopic } from '../services/geminiService';
-import { Search, Youtube, Loader2, Play, FileText } from 'lucide-react';
+import { Search, Youtube, Loader2, Play, FileText, Globe } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Props {
@@ -31,10 +31,10 @@ const YouTubeAssistant: React.FC<Props> = ({ settings }) => {
     <div className="max-w-4xl mx-auto p-6 md:p-12">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
-          <Youtube className="w-8 h-8 text-rose-500" />
-          Pencarian & Rangkuman Video
+          <Globe className="w-8 h-8 text-primary" />
+          Search Grounding Assistant
         </h1>
-        <p className="text-slate-500">Cari topik, dapatkan video relevan, dan rangkuman instan dari AI.</p>
+        <p className="text-slate-500">Cari topik terkini dengan data real-time dari Google Search & AI.</p>
       </div>
 
       {/* Search Box */}
@@ -47,13 +47,13 @@ const YouTubeAssistant: React.FC<Props> = ({ settings }) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="Masukkan topik atau judul video..." 
+          placeholder="Topik riset (mis: 'Perkembangan AI 2024')..." 
           className="flex-1 py-3 px-2 outline-none text-slate-700 placeholder:text-slate-400"
         />
         <button 
           onClick={handleSearch}
           disabled={loading || !query}
-          className="bg-rose-500 hover:bg-rose-600 text-white px-6 py-2.5 rounded-xl font-medium transition-colors disabled:bg-slate-300"
+          className="bg-primary hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors disabled:bg-slate-300"
         >
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Cari & Rangkum'}
         </button>
@@ -70,19 +70,19 @@ const YouTubeAssistant: React.FC<Props> = ({ settings }) => {
 
       {result && (
         <div className="grid md:grid-cols-3 gap-8 items-start">
-           {/* Video Column */}
+           {/* Video/Source Column */}
            <div className="md:col-span-1 space-y-4">
-              <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative group shadow-md">
-                 <img src={result.thumbnail} alt="thumb" className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity" />
+              <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative group shadow-md border border-slate-200">
+                 <img src={result.thumbnail} alt="thumb" className="w-full h-full object-cover opacity-90" />
                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
-                       <Play className="w-5 h-5 text-white fill-current ml-1" />
+                    <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
+                       <Globe className="w-5 h-5 text-primary" />
                     </div>
                  </div>
               </div>
               <h3 className="font-bold text-slate-800 leading-tight">{result.title}</h3>
-              <div className="text-xs font-mono text-slate-400 bg-slate-50 p-2 rounded border border-slate-100">
-                ID: {result.videoId}
+              <div className="text-xs font-mono text-slate-500 bg-slate-100 p-2 rounded border border-slate-200">
+                Source: Google Search
               </div>
            </div>
 
@@ -90,12 +90,12 @@ const YouTubeAssistant: React.FC<Props> = ({ settings }) => {
            <div className="md:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
               <div className="flex items-center gap-2 mb-6 pb-4 border-b border-slate-100">
                  <FileText className="w-5 h-5 text-primary" />
-                 <h2 className="font-bold text-lg text-slate-800">Rangkuman AI</h2>
+                 <h2 className="font-bold text-lg text-slate-800">Rangkuman Terverifikasi</h2>
               </div>
 
               <div className="space-y-8">
                  <div>
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Pendahuluan</h3>
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Overview (Search Data)</h3>
                     <div className="text-slate-700 leading-relaxed">
                        <ReactMarkdown>{result.summary.intro}</ReactMarkdown>
                     </div>
@@ -109,7 +109,7 @@ const YouTubeAssistant: React.FC<Props> = ({ settings }) => {
                  </div>
 
                  <div>
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Contoh & Aplikasi</h3>
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Contoh Nyata</h3>
                     <div className="text-slate-700 leading-relaxed">
                        <ReactMarkdown>{result.summary.examples}</ReactMarkdown>
                     </div>

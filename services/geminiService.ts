@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { ModuleOutline, QuizQuestion, UserSettings, YouTubeSummary } from "../lib/types";
 
 // Helper to get client with dynamic key
@@ -8,17 +8,8 @@ const getClient = (apiKey?: string) => {
   return new GoogleGenerativeAI(key);
 };
 
+// Use a model that supports structured output and tools
 const MODEL_NAME = 'gemini-1.5-flash';
-
-// Define SchemaType locally to avoid import issues during build
-enum SchemaType {
-  STRING = "STRING",
-  NUMBER = "NUMBER",
-  INTEGER = "INTEGER",
-  BOOLEAN = "BOOLEAN",
-  ARRAY = "ARRAY",
-  OBJECT = "OBJECT"
-}
 
 // Strict formatting rules for professional output
 const FORMATTING_INSTRUCTION = `
@@ -163,50 +154,61 @@ export const generateQuiz = async (chapterTitle: string, apiKey: string): Promis
 };
 
 /**
- * YouTube Summarization (Mocking Transcript Fetch)
+ * YouTube Summarization with Google Search Grounding
  */
 export const summarizeVideoTopic = async (query: string, apiKey: string): Promise<YouTubeSummary> => {
   const genAI = getClient(apiKey);
+  
+  // Use a model that supports search tools
   const model = genAI.getGenerativeModel({
     model: MODEL_NAME,
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: SchemaType.OBJECT,
-        properties: {
-          intro: { type: SchemaType.STRING },
-          concepts: { type: SchemaType.STRING },
-          examples: { type: SchemaType.STRING },
-        },
-        required: ["intro", "concepts", "examples"],
-      },
-    }
+    tools: [
+      {
+        googleSearch: {} // Search Grounding enabled
+      }
+    ]
   });
 
-  // In a real app, we would search YouTube API and fetch captions here.
-  // We will simulate a transcript for demonstration.
-  const mockTranscript = `
-    Welcome to this advanced lecture on ${query}. Today we discuss the fundamental equation E = mc². 
-    This means energy equals mass times the speed of light squared (c²). 
-    Let's look at an example. If we have 10³ kg of mass...
+  const prompt = `
+  Perform a Google Search to find a highly relevant educational video or resource about "${query}".
+  
+  Then, generate a structured summary as if it were a video lecture.
+  Structure the summary into 3 parts: 
+  1. Intro (Overview of the topic based on search results)
+  2. Concepts (Core mechanics and theories)
+  3. Examples (Practical use cases found in search)
+
+  Return JSON ONLY with this structure:
+  {
+    "intro": "...",
+    "concepts": "...",
+    "examples": "..."
+  }
+  
+  ${FORMATTING_INSTRUCTION}
   `;
 
-  const prompt = `Summarize this video transcript about "${query}".
-  Structure the summary into: Intro, Core Concepts, and Examples.
-  ${FORMATTING_INSTRUCTION}
-  Transcript: ${mockTranscript}`;
-
   try {
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+            responseMimeType: "application/json"
+        }
+    });
+
     const summary = JSON.parse(result.response.text());
+    
+    // Extract grounding metadata if available (optional for UI display)
+    const groundingMetadata = result.response.candidates?.[0]?.groundingMetadata;
 
     return {
-      videoId: 'mock-id-' + Date.now(),
-      title: `Expert Lecture: ${query}`,
-      thumbnail: 'https://placehold.co/600x400/0f766e/ffffff?text=Video+Thumbnail',
+      videoId: 'search-result-' + Date.now(),
+      title: `Search Result: ${query}`,
+      thumbnail: 'https://placehold.co/600x400/0f766e/ffffff?text=Google+Search+Result',
       summary: summary
     };
   } catch (error) {
+    console.error("Search Error", error);
     throw error;
   }
 };
