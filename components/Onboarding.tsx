@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { UserSettings } from '../types';
-import { BookOpen, Eye, EyeOff, ShieldCheck, ArrowRight, Info } from 'lucide-react';
+import { UserSettings } from '../lib/types';
+import { BookOpen, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
   onStart: (settings: UserSettings) => void;

@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ModuleOutline, UserSettings, QuizQuestion } from '../types';
+import { ModuleOutline, UserSettings, QuizQuestion } from '../lib/types';
 import { generateModuleContent, generateQuiz } from '../services/geminiService';
-import { BookOpen, CheckCircle, Loader2, PlayCircle, Award, ArrowRight, Lock } from 'lucide-react';
+import { BookOpen, CheckCircle, Loader2, PlayCircle, Award, Lock } from 'lucide-react';
 import QuizView from './QuizView';
 
 interface Props {

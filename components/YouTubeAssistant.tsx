@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserSettings, YouTubeSummary } from '../types';
+import { UserSettings, YouTubeSummary } from '../lib/types';
 import { summarizeVideoTopic } from '../services/geminiService';
 import { Search, Youtube, Loader2, Play, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';

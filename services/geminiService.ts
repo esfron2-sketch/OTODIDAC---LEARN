@@ -1,14 +1,14 @@
-import { GoogleGenAI, Schema, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { ModuleOutline, QuizQuestion, UserSettings, YouTubeSummary } from "../lib/types";
 
 // Helper to get client with dynamic key
 const getClient = (apiKey?: string) => {
-  const key = apiKey || process.env.API_KEY;
+  const key = apiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   if (!key) throw new Error("API Key Missing");
-  return new GoogleGenAI({ apiKey: key });
+  return new GoogleGenerativeAI(key);
 };
 
-const MODEL_FLASH = 'gemini-2.5-flash';
+const MODEL_NAME = 'gemini-1.5-flash';
 
 // Strict formatting rules for professional output
 const FORMATTING_INSTRUCTION = `
@@ -30,7 +30,25 @@ STRICT FORMATTING RULES (MATHEMATICS & SYMBOLS):
  * Step 1: Generate the Course Outline (Title & Sections)
  */
 export const generateCourseOutline = async (settings: UserSettings, apiKey: string): Promise<ModuleOutline[]> => {
-  const ai = getClient(apiKey);
+  const genAI = getClient(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            index: { type: SchemaType.INTEGER },
+            title: { type: SchemaType.STRING },
+            description: { type: SchemaType.STRING },
+          },
+          required: ["index", "title", "description"],
+        },
+      },
+    }
+  });
   
   const prompt = `Create a rigorous, expert-level academic syllabus for: "${settings.topic}". 
   Level: ${settings.level}. Language: ${settings.language}.
@@ -38,31 +56,10 @@ export const generateCourseOutline = async (settings: UserSettings, apiKey: stri
   Return ONLY valid JSON.
   ${FORMATTING_INSTRUCTION}`;
 
-  const schema: Schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        index: { type: Type.INTEGER },
-        title: { type: Type.STRING },
-        description: { type: Type.STRING },
-      },
-      required: ["index", "title", "description"],
-    },
-  };
-
   try {
-    const response = await ai.models.generateContent({
-      model: MODEL_FLASH,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: schema,
-        systemInstruction: "You are a university dean. " + FORMATTING_INSTRUCTION,
-      },
-    });
-
-    const rawData = response.text ? JSON.parse(response.text) : [];
+    const result = await model.generateContent(prompt);
+    const rawData = JSON.parse(result.response.text());
+    
     return rawData.map((item: any, idx: number) => ({
       ...item,
       index: idx + 1,
@@ -85,7 +82,8 @@ export const generateModuleContent = async (
   language: string,
   apiKey: string
 ): Promise<string> => {
-  const ai = getClient(apiKey);
+  const genAI = getClient(apiKey);
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
   
   const prompt = `Write a comprehensive, expert-level lecture for the module "${moduleTitle}" within the course "${topic}".
   Target Audience: ${level}. Language: ${language}.
@@ -101,15 +99,8 @@ export const generateModuleContent = async (
   ${FORMATTING_INSTRUCTION}`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: MODEL_FLASH,
-      contents: prompt,
-      config: {
-        systemInstruction: "You are a distinguished professor. " + FORMATTING_INSTRUCTION,
-      },
-    });
-
-    return response.text || "Failed to generate content.";
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
     console.error("Content Error:", error);
     return "Error loading content. Please check your API Key quota.";
@@ -120,37 +111,35 @@ export const generateModuleContent = async (
  * Step 3: Generate Quiz
  */
 export const generateQuiz = async (chapterTitle: string, apiKey: string): Promise<QuizQuestion[]> => {
-  const ai = getClient(apiKey);
+  const genAI = getClient(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            id: { type: SchemaType.INTEGER },
+            question: { type: SchemaType.STRING },
+            options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            correctAnswerIndex: { type: SchemaType.INTEGER },
+            explanation: { type: SchemaType.STRING }
+          },
+          required: ["id", "question", "options", "correctAnswerIndex", "explanation"],
+        },
+      },
+    }
+  });
   
   const prompt = `Create 3 difficult, expert-level multiple choice questions for the chapter: "${chapterTitle}".
   ${FORMATTING_INSTRUCTION}
   Ensure options are not obvious. Include detailed explanations.`;
 
-  const schema: Schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        id: { type: Type.INTEGER },
-        question: { type: Type.STRING },
-        options: { type: Type.ARRAY, items: { type: Type.STRING } },
-        correctAnswerIndex: { type: Type.INTEGER },
-        explanation: { type: Type.STRING }
-      },
-      required: ["id", "question", "options", "correctAnswerIndex", "explanation"],
-    },
-  };
-
   try {
-    const response = await ai.models.generateContent({
-      model: MODEL_FLASH,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: schema,
-      },
-    });
-    return response.text ? JSON.parse(response.text) : [];
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
   } catch (error) {
     console.error("Quiz Error", error);
     return [];
@@ -161,7 +150,22 @@ export const generateQuiz = async (chapterTitle: string, apiKey: string): Promis
  * YouTube Summarization (Mocking Transcript Fetch)
  */
 export const summarizeVideoTopic = async (query: string, apiKey: string): Promise<YouTubeSummary> => {
-  const ai = getClient(apiKey);
+  const genAI = getClient(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: SchemaType.OBJECT,
+        properties: {
+          intro: { type: SchemaType.STRING },
+          concepts: { type: SchemaType.STRING },
+          examples: { type: SchemaType.STRING },
+        },
+        required: ["intro", "concepts", "examples"],
+      },
+    }
+  });
 
   // In a real app, we would search YouTube API and fetch captions here.
   // We will simulate a transcript for demonstration.
@@ -176,27 +180,9 @@ export const summarizeVideoTopic = async (query: string, apiKey: string): Promis
   ${FORMATTING_INSTRUCTION}
   Transcript: ${mockTranscript}`;
 
-  const schema: Schema = {
-    type: Type.OBJECT,
-    properties: {
-      intro: { type: Type.STRING },
-      concepts: { type: Type.STRING },
-      examples: { type: Type.STRING },
-    },
-    required: ["intro", "concepts", "examples"],
-  };
-
   try {
-    const response = await ai.models.generateContent({
-      model: MODEL_FLASH,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: schema,
-      },
-    });
-
-    const summary = response.text ? JSON.parse(response.text) : { intro: '', concepts: '', examples: '' };
+    const result = await model.generateContent(prompt);
+    const summary = JSON.parse(result.response.text());
 
     return {
       videoId: 'mock-id-' + Date.now(),
@@ -213,14 +199,14 @@ export const summarizeVideoTopic = async (query: string, apiKey: string): Promis
  * Chat with Mentor
  */
 export const createMentorChat = (settings: UserSettings) => {
-  const ai = getClient(settings.apiKey);
-  return ai.chats.create({
-    model: MODEL_FLASH,
-    config: {
-      systemInstruction: `You are an expert academic mentor for the course "${settings.topic}".
-      Target Level: ${settings.level}. Language: ${settings.language}.
-      Provide helpful, rigorous, and encouraging guidance.
-      ${FORMATTING_INSTRUCTION}`,
-    },
+  const genAI = getClient(settings.apiKey);
+  const model = genAI.getGenerativeModel({ 
+    model: MODEL_NAME,
+    systemInstruction: `You are an expert academic mentor for the course "${settings.topic}".
+    Target Level: ${settings.level}. Language: ${settings.language}.
+    Provide helpful, rigorous, and encouraging guidance.
+    ${FORMATTING_INSTRUCTION}`
   });
+  
+  return model.startChat();
 };

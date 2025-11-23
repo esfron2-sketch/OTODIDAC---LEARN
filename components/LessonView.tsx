@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { RoadmapItem } from '../types';
+import { RoadmapItem } from '../lib/types';
 import { PlayCircle, BookOpen } from 'lucide-react';
 
 interface Props {

@@ -51,6 +51,14 @@ export interface ModuleOutline {
   content?: string;
 }
 
+export interface RoadmapItem {
+  id: number;
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  isLocked: boolean;
+}
+
 export interface QuizQuestion {
   id: number;
   question: string;
@@ -75,4 +83,16 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: Date;
+}
+
+export enum AppState {
+  ONBOARDING = 'ONBOARDING',
+  DASHBOARD = 'DASHBOARD',
+}
+
+export enum DashboardTab {
+  DASHBOARD = 'DASHBOARD',
+  GENERATE = 'GENERATE',
+  SEARCH = 'SEARCH',
+  SETTINGS = 'SETTINGS',
 }

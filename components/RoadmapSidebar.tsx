@@ -1,5 +1,5 @@
 import React from 'react';
-import { RoadmapItem } from '../types';
+import { RoadmapItem } from '../lib/types';
 import { CheckCircle, Lock, BookOpen } from 'lucide-react';
 
 interface Props {

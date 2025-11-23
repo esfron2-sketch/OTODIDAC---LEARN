@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, Bot, GraduationCap, Sparkles } from 'lucide-react';
-import { ChatMessage, UserSettings } from '../types';
+import { ChatMessage, UserSettings } from '../lib/types';
 import { createMentorChat } from '../services/geminiService';
-import { GenerateContentResponse } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
 
 interface Props {
@@ -50,7 +49,7 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
 
     try {
       if (chatSession.current) {
-        const result = await chatSession.current.sendMessageStream({ message: userMsg.text });
+        const result = await chatSession.current.sendMessageStream(userMsg.text);
         
         let fullResponse = '';
         const botMsgId = (Date.now() + 1).toString();
@@ -62,11 +61,10 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
             timestamp: new Date()
         }]);
 
-        for await (const chunk of result) {
-            const c = chunk as GenerateContentResponse;
-            const text = c.text;
-            if (text) {
-                fullResponse += text;
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+                fullResponse += chunkText;
                 setMessages(prev => prev.map(msg => 
                     msg.id === botMsgId ? { ...msg, text: fullResponse } : msg
                 ));
@@ -91,11 +89,11 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
         {/* Header */}
         <div className="p-4 bg-white border-b border-slate-200 flex items-center gap-3 shadow-sm">
             <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-secondary" />
+                <GraduationCap className="w-6 h-6 text-primary" />
             </div>
             <div>
                 <h3 className="font-bold text-slate-800 text-sm">Ruang Konsultasi Dosen</h3>
-                <p className="text-[10px] text-slate-500 text-emerald-600 flex items-center gap-1">
+                <p className="text-[10px] text-slate-500 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                     Online • OT-LEARN AI
                 </p>
@@ -108,13 +106,13 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
                 <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'model' && (
                         <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <Bot className="w-5 h-5 text-secondary" />
+                            <Bot className="w-5 h-5 text-primary" />
                         </div>
                     )}
                     
                     <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-sm
                         ${msg.role === 'user' 
-                            ? 'bg-secondary text-white rounded-br-none' 
+                            ? 'bg-primary text-white rounded-br-none' 
                             : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
                         }
                     `}>
@@ -131,7 +129,7 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
             {isTyping && (
                 <div className="flex gap-3 justify-start animate-pulse">
                      <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                        <Bot className="w-5 h-5 text-secondary" />
+                        <Bot className="w-5 h-5 text-primary" />
                     </div>
                     <div className="bg-slate-100 px-4 py-2 rounded-full text-slate-400 text-xs flex items-center gap-2">
                         <Sparkles className="w-3 h-3 text-secondary" />
@@ -151,12 +149,12 @@ const ChatInterface: React.FC<Props> = ({ settings }) => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Ketik pertanyaan Anda..."
-                    className="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-secondary/50 text-slate-700 text-sm pl-4"
+                    className="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-700 text-sm pl-4"
                 />
                 <button 
                     onClick={handleSend}
                     disabled={!input.trim() || isTyping}
-                    className="bg-secondary hover:bg-violet-700 disabled:bg-slate-300 text-white p-3 rounded-xl transition-colors shadow-lg shadow-violet-100"
+                    className="bg-primary hover:bg-violet-700 disabled:bg-slate-300 text-white p-3 rounded-xl transition-colors shadow-lg shadow-violet-100"
                 >
                     <Send className="w-5 h-5" />
                 </button>
