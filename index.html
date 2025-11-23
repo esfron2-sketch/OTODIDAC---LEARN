@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OT-LEARN - Expert Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Merriweather', 'serif'],
+            },
+            colors: {
+              primary: '#0F766E', // Teal 700
+              secondary: '#7C3AED', // Violet 600
+              accent: '#FB923C', // Orange 400
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #F8FAFC;
+        color: #0F172A;
+      }
+      .markdown-body h1 { font-size: 2em; font-weight: 700; margin-bottom: 0.5em; margin-top: 1em; color: #0F766E; }
+      .markdown-body h2 { font-size: 1.5em; font-weight: 600; margin-bottom: 0.5em; margin-top: 1em; color: #0F172A; }
+      .markdown-body h3 { font-size: 1.25em; font-weight: 600; margin-bottom: 0.5em; margin-top: 1em; color: #334155; }
+      .markdown-body p { margin-bottom: 1em; line-height: 1.7; color: #334155; }
+      .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+      .markdown-body ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+      .markdown-body code { background-color: #f1f5f9; padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; font-size: 0.9em; color: #7C3AED; }
+      .markdown-body blockquote { border-left: 4px solid #FB923C; padding-left: 1em; font-style: italic; color: #64748b; margin-bottom: 1em; background-color: #fff7ed; padding: 1em; border-radius: 0 0.5em 0.5em 0; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "next/": "https://aistudiocdn.com/next@^16.0.3/",
+    "tailwindcss": "https://aistudiocdn.com/tailwindcss@^4.1.17"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

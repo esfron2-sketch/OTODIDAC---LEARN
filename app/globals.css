@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 230, 238, 243;
+  --background-rgb: 11, 18, 32;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: #0B1220;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0F1724; 
+}
+::-webkit-scrollbar-thumb {
+  background: #334155; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7C3AED; 
+}
+
+/* Typography Utilities */
+.text-fluid-h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+.text-fluid-p {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
